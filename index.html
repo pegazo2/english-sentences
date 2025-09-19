@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Práctica de Traducción</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
+      margin: 0;
+      padding: 20px;
+      text-align: center;
+    }
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      margin: 20px auto;
+      max-width: 600px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+    .sentence {
+      font-size: 20px;
+      margin-bottom: 10px;
+    }
+    .phonetic {
+      font-size: 16px;
+      color: gray;
+      margin-bottom: 20px;
+    }
+    input {
+      padding: 10px;
+      width: 80%;
+      font-size: 16px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      margin-bottom: 10px;
+    }
+    button {
+      padding: 10px 20px;
+      border: none;
+      background: #4CAF50;
+      color: white;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #45a049;
+    }
+    .feedback {
+      margin-top: 15px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Práctica de Traducción</h1>
+  <div class="card">
+    <div class="sentence" id="sentence"></div>
+    <div class="phonetic" id="phonetic"></div>
+    
+    <input type="text" id="answer" placeholder="Escribe la traducción en español">
+    <br>
+    <button onclick="checkAnswer()">Comprobar</button>
+    
+    <div class="feedback" id="feedback"></div>
+  </div>
+
+  <script>
+    const sentences = [
+      {english: "I got to finish reading this book tonight.", phonetic: "/aɪ ɡɑɾə ˈfɪnɪʃ ˈrɪdɪŋ ðɪs bʊk təˈnaɪt/", spanish: "tengo que terminar de leer este libro esta noche"},
+      {english: "She has got to attend the meeting tomorrow.", phonetic: "/ʃi hæz ɡɑɾə əˈtɛnd ðə ˈmitɪŋ təˈmɑroʊ/", spanish: "ella tiene que asistir a la reunión mañana"},
+      {english: "We got to prepare for the presentation today.", phonetic: "/wi ɡɑɾə prɪˈpɛr fər ðə ˌprɛzənˈteɪʃən təˈdeɪ/", spanish: "tenemos que prepararnos para la presentación hoy"},
+      {english: "He got to fix the car before the trip.", phonetic: "/hi ɡɑɾə fɪks ðə kɑr bɪˈfɔr ðə trɪp/", spanish: "él tiene que arreglar el carro antes del viaje"},
+      {english: "They have got to complete the homework by tonight.", phonetic: "/ðeɪ hæv ɡɑɾə kəmˈplit ðə ˈhoʊmˌwɝk baɪ təˈnaɪt/", spanish: "ellos tienen que completar la tarea esta noche"},
+      {english: "I got to remember to call my mom today.", phonetic: "/aɪ ɡɑɾə rɪˈmɛmbɚ tə kɔl maɪ mɑm təˈdeɪ/", spanish: "tengo que recordar llamar a mi mamá hoy"},
+      {english: "She got to finish her painting by tomorrow.", phonetic: "/ʃi ɡɑɾə ˈfɪnɪʃ hɝ ˈpeɪntɪŋ baɪ təˈmɑroʊ/", spanish: "ella tiene que terminar su pintura para mañana"},
+      {english: "We have got to water the plants before leaving.", phonetic: "/wi hæv ɡɑɾə ˈwɔtɚ ðə plænts bɪˈfɔr ˈlivɪŋ/", spanish: "tenemos que regar las plantas antes de salir"},
+      {english: "He got to repair the broken chair.", phonetic: "/hi ɡɑɾə rɪˈpɛr ðə ˈbroʊkən ʧɛr/", spanish: "él tiene que reparar la silla rota"},
+      {english: "They got to submit the final report today.", phonetic: "/ðeɪ ɡɑɾə səbˈmɪt ðə ˈfaɪnəl rɪˈpɔrt təˈdeɪ/", spanish: "ellos tienen que entregar el informe final hoy"},
+      {english: "I have got to study for the test tomorrow.", phonetic: "/aɪ hæv ɡɑɾə ˈstʌdi fər ðə tɛst təˈmɑroʊ/", spanish: "tengo que estudiar para el examen de mañana"},
+      {english: "She got to pick up her brother from school.", phonetic: "/ʃi ɡɑɾə pɪk ʌp hɝ ˈbrʌðɚ frəm skul/", spanish: "ella tiene que recoger a su hermano de la escuela"},
+      {english: "We got to start the project before the deadline.", phonetic: "/wi ɡɑɾə stɑrt ðə ˈprɑʤɛkt bɪˈfɔr ðə ˈdɛdˌlaɪn/", spanish: "tenemos que comenzar el proyecto antes de la fecha límite"},
+      {english: "He got to attend the workshop this afternoon.", phonetic: "/hi ɡɑɾə əˈtɛnd ðə ˈwɝkˌʃɑp ðɪs ˌæftərˈnun/", spanish: "él tiene que asistir al taller esta tarde"},
+      {english: "They have got to clean the garage before the party.", phonetic: "/ðeɪ hæv ɡɑɾə klin ðə ɡəˈrɑʒ bɪˈfɔr ðə ˈpɑrti/", spanish: "ellos tienen que limpiar el garaje antes de la fiesta"},
+      {english: "I got to complete my assignment on time.", phonetic: "/aɪ ɡɑɾə kəmˈplit maɪ əˈsaɪnmənt ɑn taɪm/", spanish: "tengo que completar mi tarea a tiempo"},
+      {english: "She has got to submit her application soon.", phonetic: "/ʃi hæz ɡɑɾə səbˈmɪt hɝ ˌæplɪˈkeɪʃən sun/", spanish: "ella tiene que enviar su solicitud pronto"},
+      {english: "We got to check the tickets before the concert.", phonetic: "/wi ɡɑɾə ʧɛk ðə ˈtɪkɪts bɪˈfɔr ðə ˈkɑnsɚt/", spanish: "tenemos que revisar los boletos antes del concierto"},
+      {english: "He got to complete his training before promotion.", phonetic: "/hi ɡɑɾə kəmˈplit hɪz ˈtreɪnɪŋ bɪˈfɔr prəˈmoʊʃən/", spanish: "él tiene que completar su entrenamiento antes de la promoción"},
+      {english: "They got to organize the meeting room.", phonetic: "/ðeɪ ɡɑɾə ˈɔrɡəˌnaɪz ðə ˈmitɪŋ rum/", spanish: "ellos tienen que organizar la sala de reuniones"},
+      {english: "I have got to finish reading the article.", phonetic: "/aɪ hæv ɡɑɾə ˈfɪnɪʃ ˈrɪdɪŋ ði ˈɑrtɪkl/", spanish: "tengo que terminar de leer el artículo"},
+      {english: "She got to call the customer about the problem.", phonetic: "/ʃi ɡɑɾə kɔl ðə ˈkʌstəmɚ əˈbaʊt ðə ˈprɑbləm/", spanish: "ella tiene que llamar al cliente sobre el problema"},
+      {english: "We got to prepare the documents for the meeting.", phonetic: "/wi ɡɑɾə prɪˈpɛr ðə ˈdɑkjəmənts fər ðə ˈmitɪŋ/", spanish: "tenemos que preparar los documentos para la reunión"},
+      {english: "He got to fix the computer before the presentation.", phonetic: "/hi ɡɑɾə fɪks ðə kəmˈpjutɚ bɪˈfɔr ðə ˌprɛzənˈteɪʃən/", spanish: "él tiene que arreglar la computadora antes de la presentación"},
+      {english: "They have got to finalize the schedule.", phonetic: "/ðeɪ hæv ɡɑɾə ˈfaɪnəˌlaɪz ðə ˈskɛdʒul/", spanish: "ellos tienen que finalizar el horario"},
+      {english: "I got to remember to lock the door.", phonetic: "/aɪ ɡɑɾə rɪˈmɛmbɚ tə lɑk ðə dɔr/", spanish: "tengo que recordar cerrar la puerta con llave"},
+      {english: "She has got to complete the painting today.", phonetic: "/ʃi hæz ɡɑɾə kəmˈplit ðə ˈpeɪntɪŋ təˈdeɪ/", spanish: "ella tiene que terminar la pintura hoy"},
+      {english: "We got to check the weather forecast.", phonetic: "/wi ɡɑɾə ʧɛk ðə ˈwɛðɚ ˈfɔrkæst/", spanish: "tenemos que revisar el pronóstico del tiempo"},
+      {english: "He got to attend the conference next week.", phonetic: "/hi ɡɑɾə əˈtɛnd ðə ˈkɑnfərəns nɛkst wik/", spanish: "él tiene que asistir a la conferencia la próxima semana"},
+      {english: "They got to submit the final draft.", phonetic: "/ðeɪ ɡɑɾə səbˈmɪt ðə ˈfaɪnəl dræft/", spanish: "ellos tienen que entregar el borrador final"},
+      {english: "I have got to organize my notes.", phonetic: "/aɪ hæv ɡɑɾə ˈɔrɡəˌnaɪz maɪ noʊts/", spanish: "tengo que organizar mis notas"},
+      {english: "She got to finish her essay by tonight.", phonetic: "/ʃi ɡɑɾə ˈfɪnɪʃ hɝ ˈɛseɪ baɪ təˈnaɪt/", spanish: "ella tiene que terminar su ensayo esta noche"},
+      {english: "We got to clean the kitchen before guests arrive.", phonetic: "/wi ɡɑɾə klin ðə ˈkɪʧən bɪˈfɔr ɡɛsts əˈraɪv/", spanish: "tenemos que limpiar la cocina antes de que lleguen los invitados"},
+      {english: "He got to repair the broken window.", phonetic: "/hi ɡɑɾə rɪˈpɛr ðə ˈbroʊkən ˈwɪndoʊ/", spanish: "él tiene que reparar la ventana rota"},
+      {english: "They have got to complete the project soon.", phonetic: "/ðeɪ hæv ɡɑɾə kəmˈplit ðə ˈprɑʤɛkt sun/", spanish: "ellos tienen que completar el proyecto pronto"},
+      {english: "I got to pay the bills before the weekend.", phonetic: "/aɪ ɡɑɾə peɪ ðə bɪlz bɪˈfɔr ðə ˈwikˌɛnd/", spanish: "tengo que pagar las cuentas antes del fin de semana"},
+      {english: "She has got to attend her yoga class.", phonetic: "/ʃi hæz ɡɑɾə əˈtɛnd hɝ ˈjoʊɡə klæs/", spanish: "ella tiene que asistir a su clase de yoga"},
+      {english: "We got to finish decorating the hall.", phonetic: "/wi ɡɑɾə ˈfɪnɪʃ ˈdɛkəˌreɪtɪŋ ðə hɔl/", spanish: "tenemos que terminar de decorar el salón"},
+      {english: "He got to call the technician.", phonetic: "/hi ɡɑɾə kɔl ðə tɛkˈnɪʃən/", spanish: "él tiene que llamar al técnico"},
+      {english: "They got to organize their files.", phonetic: "/ðeɪ ɡɑɾə ˈɔrɡəˌnaɪz ðɛr faɪlz/", spanish: "ellos tienen que organizar sus archivos"}
+    ];
+
+    let current = 0;
+
+    function loadSentence() {
+      document.getElementById("sentence").textContent = sentences[current].english;
+      document.getElementById("phonetic").textContent = sentences[current].phonetic;
+      document.getElementById("answer").value = "";
+      document.getElementById("feedback").textContent = "";
+    }
+
+    function checkAnswer() {
+      const userAnswer = document.getElementById("answer").value.trim().toLowerCase();
+      const correctAnswer = sentences[current].spanish;
+      
+      if (userAnswer === correctAnswer) {
+        document.getElementById("feedback").textContent = "✅ ¡Correcto!";
+        document.getElementById("feedback").style.color = "green";
+      } else {
+        document.getElementById("feedback").textContent = "❌ Incorrecto. Respuesta: " + correctAnswer;
+        document.getElementById("feedback").style.color = "red";
+      }
+
+      setTimeout(() => {
+        current = (current + 1) % sentences.length;
+        loadSentence();
+      }, 2000);
+    }
+
+    loadSentence();
+  </script>
+
+</body>
+</html>
