@@ -122,32 +122,37 @@
     let current = 0;
 
     function loadSentence() {
-      document.getElementById("sentence").textContent = sentences[current].english;
-      document.getElementById("phonetic").textContent = sentences[current].phonetic;
-      document.getElementById("answer").value = "";
-      document.getElementById("feedback").textContent = "";
+    document.getElementById("sentence").textContent = sentences[current].english;
+    document.getElementById("phonetic").textContent = sentences[current].phonetic;
+    document.getElementById("answer").value = "";
+    document.getElementById("feedback").textContent = "";
+    document.getElementById("reveal").textContent = ""; // limpiar texto revelado
+  }
+
+  function checkAnswer() {
+    const userAnswer = document.getElementById("answer").value.trim().toLowerCase();
+    const correctAnswer = sentences[current].spanish;
+
+    if (userAnswer === correctAnswer) {
+      document.getElementById("feedback").textContent = "✅ ¡Correcto!";
+      document.getElementById("feedback").style.color = "green";
+    } else {
+      document.getElementById("feedback").textContent = "❌ Incorrecto. Respuesta: " + correctAnswer;
+      document.getElementById("feedback").style.color = "red";
     }
 
-    function checkAnswer() {
-      const userAnswer = document.getElementById("answer").value.trim().toLowerCase();
-      const correctAnswer = sentences[current].spanish;
-      
-      if (userAnswer === correctAnswer) {
-        document.getElementById("feedback").textContent = "✅ ¡Correcto!";
-        document.getElementById("feedback").style.color = "green";
-      } else {
-        document.getElementById("feedback").textContent = "❌ Incorrecto. Respuesta: " + correctAnswer;
-        document.getElementById("feedback").style.color = "red";
-      }
+    setTimeout(() => {
+      current = (current + 1) % sentences.length;
+      loadSentence();
+    }, 2000);
+  }
 
-      setTimeout(() => {
-        current = (current + 1) % sentences.length;
-        loadSentence();
-      }, 2000);
-    }
+  // 🔹 AQUI AGREGAS LA NUEVA FUNCIÓN
+  function revealWord() {
+    document.getElementById("reveal").textContent = "👉 " + sentences[current].spanish; 
+  }
 
-    loadSentence();
-  </script>
-
+  loadSentence();
+</script>
 </body>
 </html>
