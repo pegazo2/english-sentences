@@ -43,6 +43,7 @@
       color: white;
       border-radius: 8px;
       cursor: pointer;
+      margin: 5px;
     }
     button:hover {
       background: #45a049;
@@ -50,6 +51,11 @@
     .feedback {
       margin-top: 15px;
       font-weight: bold;
+    }
+    .reveal {
+      margin-top: 10px;
+      font-style: italic;
+      color: #444;
     }
   </style>
 </head>
@@ -63,10 +69,12 @@
     <input type="text" id="answer" placeholder="Escribe la traducción en español">
     <br>
     <button onclick="checkAnswer()">Comprobar</button>
+    <button onclick="revealWord()">Revelar palabra en español</button>
     
     <div class="feedback" id="feedback"></div>
+    <div class="reveal" id="reveal"></div>
   </div>
-
+  
   <script>
     const sentences = [
       {english: "I got to finish reading this book tonight.", phonetic: "/aɪ ɡɑɾə ˈfɪnɪʃ ˈrɪdɪŋ ðɪs bʊk təˈnaɪt/", spanish: "tengo que terminar de leer este libro esta noche"},
